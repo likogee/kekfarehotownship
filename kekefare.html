@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#f97316" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="description" content="Check real-time keke fares in Ho Township, Ghana" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgcng9IjQyIiBmaWxsPSIjZjk3MzE2Ii8+PHRleHQgeD0iOTYiIHk9IjEzMCIgZm9udC1zaXplPSIxMDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPvCfm7o8L3RleHQ+PC9zdmc+" />
+    <title>Keke Fare • Ho Township</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            outline: none !important;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+        input, textarea, [contenteditable="true"] {
+            -webkit-user-select: text !important;
+            -moz-user-select: text !important;
+            -ms-user-select: text !important;
+            user-select: text !important;
+        }
+        body { font-family: 'Inter', -apple-system, system-ui, sans-serif; background: #f0f4f8; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 16px; -webkit-font-smoothing: antialiased; }
+        .container { max-width: 440px; width: 100%; background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 40px; padding: 32px 24px 36px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.02); border: 1px solid rgba(255, 255, 255, 0.6); position: relative; margin-top: 20px; margin-bottom: 20px; }
+        .container::before { content: ''; position: absolute; inset: -1px; background: linear-gradient(135deg, rgba(249, 115, 22, 0.08), rgba(234, 88, 12, 0.05)); border-radius: 41px; z-index: -1; }
+        .whatsapp-float { position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px; background: linear-gradient(145deg, #25D366, #1da851); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 32px rgba(37, 211, 102, 0.35); cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 999; text-decoration: none; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-6px); } }
+        .whatsapp-float:hover { transform: scale(1.12) translateY(-4px); }
+        .whatsapp-float:active { transform: scale(0.92); }
+        .whatsapp-float svg { width: 32px; height: 32px; fill: white; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .header .icon-wrapper { display: inline-flex; align-items: center; justify-content: center; width: 68px; height: 68px; background: linear-gradient(145deg, #fff7ed, #fed7aa); border-radius: 50%; font-size: 34px; margin-bottom: 10px; box-shadow: 0 4px 20px rgba(249, 115, 22, 0.12); }
+        .header h1 { font-size: 30px; font-weight: 800; color: #0b1a33; letter-spacing: -0.8px; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+        .header h1 .highlight { background: linear-gradient(145deg, #f97316, #ea580c); color: white; padding: 0 16px; border-radius: 60px; font-size: 0.9em; line-height: 1.5; box-shadow: 0 4px 16px rgba(249, 115, 22, 0.2); }
+        .header .subtitle { color: #94a3b8; font-size: 14px; font-weight: 500; margin-top: 4px; }
+        .header .subtitle span { color: #f97316; font-weight: 600; }
+        .offline-banner { background: #fef3c7; color: #92400e; font-size: 11px; font-weight: 600; padding: 8px 14px; border-radius: 12px; margin-bottom: 12px; text-align: center; display: none; }
+        .offline-banner.show { display: block; }
+        #loading { text-align: center; padding: 40px 0 20px; }
+        #loading .spinner { width: 36px; height: 36px; border: 3px solid #f1f4f9; border-top: 3px solid #f97316; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 14px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        #loading p { color: #94a3b8; font-weight: 500; font-size: 14px; }
+        .field { margin-bottom: 12px; position: relative; }
+        .field label { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 5px; padding-left: 4px; }
+        .autocomplete-wrapper { position: relative; }
+        .field input.search-input { width: 100%; padding: 14px 40px 14px 18px; font-size: 15px; font-weight: 500; color: #0b1a33; background-color: #f8fafc; border: 2px solid #e9edf2; border-radius: 24px; transition: all 0.2s ease; font-family: inherit; }
+        .field input.search-input:hover { background-color: #ffffff; border-color: #dce1e9; }
+        .field input.search-input:focus { border-color: #f97316; background-color: #ffffff; box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.06) !important; }
+        .field .clear-btn { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: #e9edf2; border: none; width: 22px; height: 22px; border-radius: 50%; font-size: 11px; color: #64748b; cursor: pointer; display: none; align-items: center; justify-content: center; font-weight: 700; font-family: inherit; }
+        .field .clear-btn.show { display: flex; }
+        .field .clear-btn:hover { background: #cbd5e1; }
+        .autocomplete-list { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #ffffff; border: 2px solid #e9edf2; border-radius: 16px; max-height: 200px; overflow-y: auto; box-shadow: 0 8px 24px rgba(0,0,0,0.08); z-index: 50; display: none; }
+        .autocomplete-list.show { display: block; }
+        .autocomplete-list::-webkit-scrollbar { width: 3px; }
+        .autocomplete-list::-webkit-scrollbar-thumb { background: #dce1e9; border-radius: 10px; }
+        .autocomplete-item { padding: 12px 18px; font-size: 14px; color: #0b1a33; cursor: pointer; font-weight: 500; border-bottom: 1px solid #f8fafc; display: flex; align-items: center; gap: 8px; }
+        .autocomplete-item:last-child { border-bottom: none; }
+        .autocomplete-item:hover, .autocomplete-item.highlighted { background: #fff7ed; color: #f97316; }
+        .autocomplete-item mark { background: #fef08a; color: #0b1a33; font-weight: 700; padding: 0 2px; border-radius: 3px; }
+        .swap-row { display: flex; justify-content: center; margin: 2px 0 4px; }
+        .swap-btn { background: #f1f4f9; border: none; width: 44px; height: 44px; border-radius: 50%; font-size: 20px; color: #1e293b; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); display: flex; align-items: center; justify-content: center; }
+        .swap-btn:hover { background: #e2e8f0; transform: scale(1.05); }
+        .swap-btn:active { transform: rotate(180deg) scale(0.92); }
+        .btn-search { width: 100%; padding: 16px 20px; background: linear-gradient(145deg, #f97316, #ea580c); border: none; border-radius: 24px; color: #ffffff; font-weight: 700; font-size: 17px; letter-spacing: 0.5px; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); margin-top: 12px; box-shadow: 0 8px 28px rgba(249, 115, 22, 0.25); position: relative; overflow: hidden; font-family: inherit; }
+        .btn-search:hover { transform: translateY(-3px); box-shadow: 0 12px 36px rgba(249, 115, 22, 0.35); }
+        .btn-search:active { transform: translateY(0px) scale(0.98); }
+        .btn-search:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+        .chips-section { margin-top: 18px; }
+        .chips-label { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .chips-list { display: flex; flex-wrap: wrap; gap: 6px; }
+        .chip { background: #f1f4f9; border: none; border-radius: 20px; padding: 8px 14px; font-size: 12px; font-weight: 600; color: #1e293b; cursor: pointer; transition: all 0.2s ease; font-family: inherit; display: inline-flex; align-items: center; gap: 5px; }
+        .chip:hover { background: #fff7ed; color: #f97316; transform: translateY(-1px); }
+        .chip:active { transform: scale(0.96); }
+        .chip .chip-icon { font-size: 11px; }
+        .chip.favorite { background: #fef3c7; color: #92400e; }
+        .chip.favorite:hover { background: #fde68a; color: #78350f; }
+        .chip-remove { background: transparent; border: none; color: inherit; font-size: 10px; cursor: pointer; padding: 0 2px; opacity: 0.5; font-family: inherit; }
+        .chip-remove:hover { opacity: 1; }
+        .footer-status { margin-top: 20px; font-size: 12px; color: #94a3b8; text-align: center; border-top: 1px solid #f1f4f9; padding-top: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .status-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #22c55e; transition: background 0.25s ease; }
+        .status-dot.error { background: #f43f5e; }
+        .status-dot.loading-dot { background: #f97316; animation: pulseDot 1s ease-in-out infinite; }
+        @keyframes pulseDot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.8); } }
+        .brand-badge { text-align: center; margin-top: 14px; font-size: 11px; color: #cbd5e1; letter-spacing: 0.2px; }
+        .brand-badge a { color: #f97316; text-decoration: none; font-weight: 600; }
+        .brand-badge a:hover { text-decoration: underline; }
+        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 16px; animation: fadeIn 0.25s ease; }
+        .popup-overlay.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .popup-card { background: #ffffff; border-radius: 32px; max-width: 440px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 32px 80px rgba(0, 0, 0, 0.2); animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; }
+        .popup-card::-webkit-scrollbar { width: 3px; }
+        .popup-card::-webkit-scrollbar-thumb { background: #e9edf2; border-radius: 10px; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(40px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .popup-close { position: absolute; top: 14px; right: 14px; width: 40px; height: 40px; border-radius: 50%; background: rgba(255, 255, 255, 0.92); border: none; font-size: 20px; color: #1e293b; cursor: pointer; transition: all 0.2s ease; z-index: 20; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06); backdrop-filter: blur(8px); font-family: inherit; }
+        .popup-close:hover { background: #ffffff; transform: scale(1.08) rotate(90deg); }
+        .slider-container { position: relative; width: 100%; height: 250px; overflow: hidden; border-radius: 32px 32px 0 0; background: #e9edf2; }
+        .slider-track { display: flex; transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); height: 100%; }
+        .slider-slide { min-width: 100%; height: 100%; position: relative; flex-shrink: 0; cursor: zoom-in; }
+        .slider-slide img { width: 100%; height: 100%; object-fit: cover; display: block; -webkit-user-drag: none; }
+        .slider-slide .image-gradient { position: absolute; bottom: 0; left: 0; right: 0; height: 60%; background: linear-gradient(to top, rgba(0, 0, 0, 0.5), transparent); pointer-events: none; }
+        .slider-slide .route-badge-large { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(255, 255, 255, 0.95); color: #0b1a33; padding: 6px 20px; border-radius: 40px; font-weight: 700; font-size: 15px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); backdrop-filter: blur(8px); display: flex; align-items: center; gap: 8px; white-space: nowrap; pointer-events: none; }
+        .slider-slide .route-badge-large .arrow-icon { color: #f97316; font-weight: 800; margin: 0 4px; }
+        .slider-dots { position: absolute; bottom: 76px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 5; }
+        .slider-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255, 255, 255, 0.4); border: none; cursor: pointer; transition: all 0.3s ease; padding: 0; }
+        .slider-dot.active { background: #ffffff; transform: scale(1.3); }
+        .slider-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border-radius: 50%; background: rgba(255, 255, 255, 0.9); border: none; font-size: 16px; color: #1e293b; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06); backdrop-filter: blur(8px); }
+        .slider-arrow:hover { background: #ffffff; transform: translateY(-50%) scale(1.08); }
+        .slider-arrow.prev { left: 10px; }
+        .slider-arrow.next { right: 10px; }
+        .popup-content { padding: 20px 20px 18px; }
+        .popup-content .fare-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
+        .popup-content .fare-label { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 2px; }
+        .popup-content .fare-amount { font-size: 46px; font-weight: 800; color: #0b1a33; letter-spacing: -2px; line-height: 1; }
+        .popup-content .verified-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; color: #22c55e; background: #f0fdf4; padding: 3px 12px; border-radius: 40px; }
+        .popup-content .route-display-large { font-weight: 600; color: #1e293b; font-size: 16px; margin: 8px 0 14px; padding: 10px 16px; background: #f8fafc; border-radius: 16px; display: inline-block; width: 100%; text-align: center; }
+        .popup-content .route-display-large .arrow { color: #f97316; font-weight: 800; margin: 0 10px; }
+        .popup-content .divider { border: none; border-top: 2px dashed #f1f4f9; margin: 14px 0; }
+        .popup-content .details-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 2px; }
+        .popup-content .detail-card { background: #f8fafc; border-radius: 12px; padding: 10px 6px; text-align: center; }
+        .popup-content .detail-card .detail-icon { font-size: 18px; display: block; margin-bottom: 2px; }
+        .popup-content .detail-card .detail-label { font-size: 9px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+        .popup-content .detail-card .detail-value { font-size: 13px; font-weight: 700; color: #0b1a33; margin-top: 2px; }
+        .popup-content .detail-card .detail-value .badge-sm { background: #e9edf2; padding: 1px 10px; border-radius: 40px; font-weight: 600; font-size: 11px; color: #1e293b; }
+        .popup-content .last-updated { display: block; font-size: 10px; color: #94a3b8; margin-top: 8px; text-align: center; font-weight: 500; }
+        .popup-content .action-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+        .popup-content .action-row .btn-action { flex: 1; padding: 12px; background: #f1f4f9; border: none; border-radius: 14px; color: #1e293b; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s ease; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 5px; min-width: 60px; }
+        .popup-content .action-row .btn-action:hover { background: #e2e8f0; }
+        .popup-content .action-row .btn-action:active { transform: scale(0.97); }
+        .popup-content .action-row .btn-action.primary { background: linear-gradient(145deg, #f97316, #ea580c); color: white; box-shadow: 0 4px 16px rgba(249, 115, 22, 0.2); flex: 1.5; }
+        .popup-content .action-row .btn-action.primary:hover { box-shadow: 0 6px 24px rgba(249, 115, 22, 0.3); transform: translateY(-2px); }
+        .popup-content .action-row .btn-action.favorite-btn.active { background: #fef3c7; color: #92400e; }
+        .popup-not-found { padding: 40px 20px 32px; text-align: center; }
+        .popup-not-found .not-found-icon { font-size: 48px; display: block; margin-bottom: 10px; }
+        .popup-not-found .not-found-text { color: #e11d48; font-weight: 700; font-size: 20px; }
+        .popup-not-found .not-found-sub { color: #94a3b8; font-size: 14px; margin-top: 4px; line-height: 1.6; }
+        .popup-not-found .report-btn { margin-top: 16px; padding: 10px 24px; background: #f1f4f9; border: none; border-radius: 12px; font-weight: 600; font-size: 13px; cursor: pointer; font-family: inherit; color: #1e293b; }
+        .popup-not-found .report-btn:hover { background: #e2e8f0; }
+        .report-modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); z-index: 1100; display: none; align-items: center; justify-content: center; padding: 16px; }
+        .report-modal-overlay.active { display: flex; }
+        .report-modal { background: white; border-radius: 24px; max-width: 380px; width: 100%; padding: 24px 20px; box-shadow: 0 24px 64px rgba(0, 0, 0, 0.25); animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .report-modal h3 { font-size: 18px; font-weight: 800; color: #0b1a33; margin-bottom: 4px; }
+        .report-modal p { font-size: 12px; color: #64748b; margin-bottom: 16px; }
+        .report-modal label { display: block; font-size: 10px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; margin-top: 10px; }
+        .report-modal input, .report-modal textarea { width: 100%; padding: 10px 14px; font-size: 14px; border: 2px solid #e9edf2; border-radius: 12px; font-family: inherit; background: #f8fafc; transition: all 0.2s; }
+        .report-modal input:focus, .report-modal textarea:focus { border-color: #f97316; background: white; }
+        .report-modal textarea { resize: vertical; min-height: 70px; }
+        .report-modal .report-actions { display: flex; gap: 8px; margin-top: 18px; }
+        .report-modal .report-actions button { flex: 1; padding: 12px; border: none; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; font-family: inherit; }
+        .report-modal .report-actions .cancel { background: #f1f4f9; color: #1e293b; }
+        .report-modal .report-actions .submit { background: linear-gradient(145deg, #f97316, #ea580c); color: white; }
+        .image-viewer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 3000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .image-viewer-overlay.active { display: flex; }
+        .image-viewer-overlay img { max-width: 100%; max-height: 85vh; border-radius: 12px; }
+        .image-viewer-close { position: absolute; top: 20px; right: 20px; width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.15); border: none; color: white; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: inherit; }
+        .image-viewer-close:hover { background: rgba(255,255,255,0.25); }
+        .share-menu-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 1200; display: none; align-items: flex-end; justify-content: center; padding: 16px; }
+        .share-menu-overlay.active { display: flex; }
+        .share-menu { background: white; border-radius: 24px 24px 20px 20px; width: 100%; max-width: 400px; padding: 20px 16px; box-shadow: 0 -10px 60px rgba(0,0,0,0.3); animation: slideUpSheet 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes slideUpSheet { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .share-menu h4 { font-size: 14px; font-weight: 800; color: #0b1a33; margin-bottom: 4px; text-align: center; }
+        .share-menu p { font-size: 11px; color: #94a3b8; text-align: center; margin-bottom: 14px; }
+        .share-menu-options { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .share-option { background: #f8fafc; border: none; border-radius: 14px; padding: 12px 6px; cursor: pointer; font-family: inherit; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: all 0.2s ease; }
+        .share-option:hover { background: #f1f4f9; transform: translateY(-2px); }
+        .share-option:active { transform: scale(0.95); }
+        .share-option .share-icon { font-size: 22px; }
+        .share-option .share-label { font-size: 10px; font-weight: 600; color: #475569; }
+        .share-menu-cancel { width: 100%; margin-top: 14px; padding: 12px; background: #f1f4f9; border: none; border-radius: 12px; font-weight: 700; font-size: 13px; color: #1e293b; cursor: pointer; font-family: inherit; }
+        @media (max-width: 440px) {
+            .container { padding: 24px 16px 28px; border-radius: 32px; }
+            .header h1 { font-size: 24px; }
+            .header .icon-wrapper { width: 56px; height: 56px; font-size: 28px; }
+            .popup-card { border-radius: 28px; max-height: 95vh; }
+            .slider-container { height: 200px; border-radius: 28px 28px 0 0; }
+            .popup-content { padding: 18px 14px 16px; }
+            .popup-content .fare-amount { font-size: 38px; }
+            .popup-content .details-grid { gap: 6px; }
+            .popup-content .action-row { gap: 6px; }
+            .popup-content .action-row .btn-action { font-size: 12px; padding: 10px; }
+            .popup-close { top: 10px; right: 10px; width: 36px; height: 36px; font-size: 16px; }
+            .whatsapp-float { width: 50px; height: 50px; bottom: 16px; right: 16px; }
+            .whatsapp-float svg { width: 26px; height: 26px; }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="https://wa.me/233243383768?text=Hi%20Liko%20Tec%20Solutions%2C%20I%20need%20a%20custom%20business%20app%20solution%20for%20:"
+       class="whatsapp-float" target="_blank" id="whatsappBtn" aria-label="Contact on WhatsApp">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    </a>
+
+    <div class="container">
+
+        <div class="header">
+            <div class="icon-wrapper">🛺</div>
+            <h1>Keke <span class="highlight">Fare</span></h1>
+            <div class="subtitle">Ho Township • <span>real-time rates</span></div>
+        </div>
+
+        <div class="offline-banner" id="offlineBanner">📴 Showing cached data — check your connection</div>
+
+        <div id="loading">
+            <div class="spinner"></div>
+            <p>Loading rates…</p>
+        </div>
+
+        <div id="fareForm" style="display: none;">
+
+            <div class="field">
+                <label><span>📍</span> From</label>
+                <div class="autocomplete-wrapper">
+                    <input type="text" id="fromInput" class="search-input" placeholder="Type to search…" autocomplete="off" />
+                    <button class="clear-btn" id="fromClear" aria-label="Clear">✕</button>
+                    <div class="autocomplete-list" id="fromList"></div>
+                </div>
+            </div>
+
+            <div class="swap-row">
+                <button class="swap-btn" id="swapBtn" aria-label="Swap locations">⇄</button>
+            </div>
+
+            <div class="field">
+                <label><span>🏁</span> To</label>
+                <div class="autocomplete-wrapper">
+                    <input type="text" id="toInput" class="search-input" placeholder="Type to search…" autocomplete="off" />
+                    <button class="clear-btn" id="toClear" aria-label="Clear">✕</button>
+                    <div class="autocomplete-list" id="toList"></div>
+                </div>
+            </div>
+
+            <button class="btn-search" id="getFareBtn">✨ Find Fare</button>
+
+            <div class="chips-section" id="recentSection" style="display: none;">
+                <div class="chips-label">🕐 Recent</div>
+                <div class="chips-list" id="recentChips"></div>
+            </div>
+
+            <div class="chips-section" id="favoritesSection" style="display: none;">
+                <div class="chips-label">⭐ Favorites</div>
+                <div class="chips-list" id="favoriteChips"></div>
+            </div>
+
+            <div class="footer-status">
+                <span class="status-dot" id="statusDot"></span>
+                <span id="statusText">Ready</span>
+            </div>
+
+            <div class="brand-badge">
+                Powered by <a href="#">Liko Tec Solutions</a> • Build. Scale. Solve.
+            </div>
+        </div>
+
+    </div>
+
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="popup-card" id="popupCard">
+            <button class="popup-close" id="popupClose" aria-label="Close">✕</button>
+            <div id="popupContent"></div>
+        </div>
+    </div>
+
+    <!-- Report Modal -->
+    <div class="report-modal-overlay" id="reportOverlay">
+        <div class="report-modal">
+            <h3>📢 Report wrong fare</h3>
+            <p id="reportRouteText">Help us keep fares accurate</p>
+            <label>What fare did you pay?</label>
+            <input type="text" id="reportFare" placeholder="e.g., GHS 3.00" />
+            <label>Comment (optional)</label>
+            <textarea id="reportComment" placeholder="e.g., driver charged more at night"></textarea>
+            <div class="report-actions">
+                <button class="cancel" id="reportCancelBtn">Cancel</button>
+                <button class="submit" id="reportSubmitBtn">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Viewer -->
+    <div class="image-viewer-overlay" id="imageViewer">
+        <button class="image-viewer-close" id="imageViewerClose">✕</button>
+        <img id="imageViewerImg" src="" alt="Preview" />
+    </div>
+
+    <!-- Share Menu -->
+    <div class="share-menu-overlay" id="shareMenu">
+        <div class="share-menu">
+            <h4>📤 Share this fare</h4>
+            <p id="shareMenuSubtitle">Choose how to share</p>
+            <div class="share-menu-options">
+                <button class="share-option" id="shareWhatsApp">
+                    <span class="share-icon">💬</span>
+                    <span class="share-label">WhatsApp</span>
+                </button>
+                <button class="share-option" id="shareCopy">
+                    <span class="share-icon">📋</span>
+                    <span class="share-label">Copy</span>
+                </button>
+                <button class="share-option" id="shareNative">
+                    <span class="share-icon">📱</span>
+                    <span class="share-label">More</span>
+                </button>
+                <button class="share-option" id="shareImage">
+                    <span class="share-icon">🖼️</span>
+                    <span class="share-label">Image</span>
+                </button>
+            </div>
+            <button class="share-menu-cancel" id="shareMenuCancel">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://script.google.com/macros/s/AKfycbw8h3RbsXEDr1h4HgtP_bJbErFPq7QyWH6mqjogIPutyMRjNR6MhqQIbw9e4kV18h3SAQ/exec';
+
+        const $ = function(id) { return document.getElementById(id); };
+        const loadingEl = $('loading');
+        const formEl = $('fareForm');
+        const fromInput = $('fromInput');
+        const toInput = $('toInput');
+        const fromList = $('fromList');
+        const toList = $('toList');
+        const fromClear = $('fromClear');
+        const toClear = $('toClear');
+        const swapBtn = $('swapBtn');
+        const getFareBtn = $('getFareBtn');
+        const statusDot = $('statusDot');
+        const statusText = $('statusText');
+        const popupOverlay = $('popupOverlay');
+        const popupContent = $('popupContent');
+        const popupClose = $('popupClose');
+        const offlineBanner = $('offlineBanner');
+        const recentSection = $('recentSection');
+        const recentChips = $('recentChips');
+        const favoritesSection = $('favoritesSection');
+        const favoriteChips = $('favoriteChips');
+        const reportOverlay = $('reportOverlay');
+        const reportRouteText = $('reportRouteText');
+        const reportFare = $('reportFare');
+        const reportComment = $('reportComment');
+        const reportCancelBtn = $('reportCancelBtn');
+        const reportSubmitBtn = $('reportSubmitBtn');
+        const imageViewer = $('imageViewer');
+        const imageViewerImg = $('imageViewerImg');
+        const imageViewerClose = $('imageViewerClose');
+        const shareMenu = $('shareMenu');
+        const shareMenuSubtitle = $('shareMenuSubtitle');
+
+        let fareData = [];
+        let allLocations = [];
+        let slideInterval = null;
+        let currentSlide = 0;
+        let currentMatch = null;
+        let currentFrom = '';
+        let currentTo = '';
+        let currentFareDisplay = '';
+        let reportContext = { from: '', to: '' };
+
+        // ============================================================
+        // SAFE HELPERS
+        // ============================================================
+        function safeStr(val) {
+            if (val === null || val === undefined) return '';
+            return String(val).trim();
+        }
+
+        function esc(str) {
+            return String(str == null ? '' : str)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        function setStatus(text, type) {
+            type = type || 'idle';
+            statusText.textContent = text;
+            statusDot.className = 'status-dot';
+            if (type === 'error') statusDot.classList.add('error');
+            else if (type === 'loading') statusDot.classList.add('loading-dot');
+        }
+
+        function showLoading(show) {
+            loadingEl.style.display = show ? 'block' : 'none';
+            formEl.style.display = show ? 'none' : 'block';
+        }
+
+        // ============================================================
+        // IMAGE FALLBACK HANDLER
+        // ============================================================
+        window.handleImageError = function(img) {
+            const triedFallback = img.dataset.triedFallback === '1';
+            if (!triedFallback && img.dataset.fallback) {
+                img.dataset.triedFallback = '1';
+                img.src = img.dataset.fallback;
+            } else {
+                img.onerror = null;
+                img.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+                    '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="350" viewBox="0 0 600 350">' +
+                    '<rect width="600" height="350" fill="#f1f4f9"/>' +
+                    '<text x="300" y="185" font-size="60" text-anchor="middle" fill="#94a3b8">🛺</text>' +
+                    '</svg>'
+                );
+            }
+        };
+
+        // ============================================================
+        // IMAGE VIEWER
+        // ============================================================
+        function openImageViewer(url) {
+            if (!url) return;
+            imageViewerImg.src = url;
+            imageViewer.classList.add('active');
+        }
+
+        function closeImageViewer() {
+            imageViewer.classList.remove('active');
+            imageViewerImg.src = '';
+        }
+
+        imageViewerClose.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            closeImageViewer();
+        });
+
+        imageViewer.addEventListener('click', function(e) {
+            if (e.target === imageViewer) closeImageViewer();
+        });
+
+        // ============================================================
+        // ANALYTICS
+        // ============================================================
+        function logAnalytics(event, from, to, fare) {
+            fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    type: 'analytics', event: event,
+                    from_location: from || '', to_location: to || '',
+                    fare: fare || '', user_agent: navigator.userAgent
+                })
+            }).catch(function() {});
+        }
+
+        // ============================================================
+        // LOCAL STORAGE
+        // ============================================================
+        function getRecent() {
+            try { return JSON.parse(localStorage.getItem('keke_recent') || '[]'); }
+            catch (e) { return []; }
+        }
+
+        function addRecent(from, to) {
+            try {
+                let recents = getRecent();
+                recents = recents.filter(function(r) { return !(r.from === from && r.to === to); });
+                recents.unshift({ from: from, to: to, time: Date.now() });
+                recents = recents.slice(0, 5);
+                localStorage.setItem('keke_recent', JSON.stringify(recents));
+                renderRecent();
+            } catch (e) {}
+        }
+
+        function getFavorites() {
+            try { return JSON.parse(localStorage.getItem('keke_favorites') || '[]'); }
+            catch (e) { return []; }
+        }
+
+        function isFavorite(from, to) {
+            return getFavorites().some(function(f) { return f.from === from && f.to === to; });
+        }
+
+        function toggleFavorite(from, to) {
+            let favs = getFavorites();
+            const exists = favs.some(function(f) { return f.from === from && f.to === to; });
+            if (exists) {
+                favs = favs.filter(function(f) { return !(f.from === from && f.to === to); });
+            } else {
+                favs.unshift({ from: from, to: to });
+                favs = favs.slice(0, 6);
+            }
+            localStorage.setItem('keke_favorites', JSON.stringify(favs));
+            renderFavorites();
+            return !exists;
+        }
+
+        function renderRecent() {
+            const recents = getRecent();
+            if (recents.length === 0) { recentSection.style.display = 'none'; return; }
+            recentSection.style.display = 'block';
+            recentChips.innerHTML = '';
+            recents.forEach(function(r) {
+                const btn = document.createElement('button');
+                btn.className = 'chip';
+                btn.type = 'button';
+                btn.innerHTML = '<span class="chip-icon">🕐</span> ' + esc(r.from) + ' → ' + esc(r.to);
+                btn.addEventListener('click', function() { useRoute(r.from, r.to); });
+                recentChips.appendChild(btn);
+            });
+        }
+
+        function renderFavorites() {
+            const favs = getFavorites();
+            if (favs.length === 0) { favoritesSection.style.display = 'none'; return; }
+            favoritesSection.style.display = 'block';
+            favoriteChips.innerHTML = '';
+            favs.forEach(function(f, i) {
+                const btn = document.createElement('button');
+                btn.className = 'chip favorite';
+                btn.type = 'button';
+                btn.innerHTML = '<span class="chip-icon">⭐</span> ' + esc(f.from) + ' → ' + esc(f.to) + '<span class="chip-remove">✕</span>';
+                btn.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('chip-remove')) {
+                        e.stopPropagation(); removeFavorite(i); return;
+                    }
+                    useRoute(f.from, f.to);
+                });
+                favoriteChips.appendChild(btn);
+            });
+        }
+
+        function useRoute(from, to) {
+            fromInput.value = from; toInput.value = to;
+            updateClearButtons(); findFare();
+        }
+
+        function removeFavorite(idx) {
+            let favs = getFavorites();
+            favs.splice(idx, 1);
+            localStorage.setItem('keke_favorites', JSON.stringify(favs));
+            renderFavorites();
+        }
+
+        function updateClearButtons() {
+            fromClear.classList.toggle('show', fromInput.value.length > 0);
+            toClear.classList.toggle('show', toInput.value.length > 0);
+        }
+
+        // ============================================================
+        // AUTOCOMPLETE
+        // ============================================================
+        let highlightedIndex = -1;
+
+        function filterLocations(query) {
+            const q = safeStr(query).toLowerCase();
+            if (!q) return allLocations.slice(0, 8);
+            return allLocations.filter(function(loc) {
+                return loc.toLowerCase().indexOf(q) !== -1;
+            }).slice(0, 8);
+        }
+
+        function highlightMatch(text, query) {
+            const q = safeStr(query);
+            if (!q) return esc(text);
+            const idx = text.toLowerCase().indexOf(q.toLowerCase());
+            if (idx === -1) return esc(text);
+            return esc(text.substring(0, idx)) +
+                   '<mark>' + esc(text.substring(idx, idx + q.length)) + '</mark>' +
+                   esc(text.substring(idx + q.length));
+        }
+
+        function showAutocomplete(field, listEl, inputEl) {
+            const query = inputEl.value;
+            const matches = filterLocations(query);
+            if (matches.length === 0) { listEl.classList.remove('show'); return; }
+            listEl.innerHTML = '';
+            matches.forEach(function(loc, i) {
+                const item = document.createElement('div');
+                item.className = 'autocomplete-item' + (i === highlightedIndex ? ' highlighted' : '');
+                item.innerHTML = '<span>📍</span>' + highlightMatch(loc, query);
+                item.addEventListener('click', function() { selectLocation(loc, field); });
+                listEl.appendChild(item);
+            });
+            listEl.classList.add('show');
+        }
+
+        function selectLocation(value, field) {
+            if (field === 'from') { fromInput.value = value; fromList.classList.remove('show'); }
+            else { toInput.value = value; toList.classList.remove('show'); }
+            updateClearButtons();
+        }
+
+        fromInput.addEventListener('input', function() { highlightedIndex = -1; updateClearButtons(); showAutocomplete('from', fromList, fromInput); });
+        toInput.addEventListener('input', function() { highlightedIndex = -1; updateClearButtons(); showAutocomplete('to', toList, toInput); });
+        fromInput.addEventListener('focus', function() { showAutocomplete('from', fromList, fromInput); });
+        toInput.addEventListener('focus', function() { showAutocomplete('to', toList, toInput); });
+
+        fromClear.addEventListener('click', function() { fromInput.value = ''; updateClearButtons(); fromList.classList.remove('show'); fromInput.focus(); });
+        toClear.addEventListener('click', function() { toInput.value = ''; updateClearButtons(); toList.classList.remove('show'); toInput.focus(); });
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.autocomplete-wrapper')) {
+                fromList.classList.remove('show');
+                toList.classList.remove('show');
+            }
+        });
+
+        // ============================================================
+        // POPUP
+        // ============================================================
+        function openPopup() {
+            popupOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePopup() {
+            popupOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+            if (slideInterval) { clearInterval(slideInterval); slideInterval = null; }
+        }
+
+        popupClose.addEventListener('click', function(e) {
+            e.preventDefault(); e.stopPropagation(); closePopup();
+        });
+        popupOverlay.addEventListener('click', function(e) {
+            if (e.target === popupOverlay) closePopup();
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (imageViewer.classList.contains('active')) closeImageViewer();
+                else if (shareMenu.classList.contains('active')) closeShareMenu();
+                else if (reportOverlay.classList.contains('active')) closeReport();
+                else if (popupOverlay.classList.contains('active')) closePopup();
+            }
+        });
+
+        // ============================================================
+        // SLIDER
+        // ============================================================
+        function goToSlide(index, totalSlides) {
+            if (totalSlides <= 1) return;
+            if (index < 0) index = totalSlides - 1;
+            if (index >= totalSlides) index = 0;
+            currentSlide = index;
+            const track = document.querySelector('.slider-track');
+            if (track) track.style.transform = 'translateX(-' + (index * 100) + '%)';
+            document.querySelectorAll('.slider-dot').forEach(function(dot, i) {
+                dot.classList.toggle('active', i === index);
+            });
+        }
+
+        function nextSlide(total) { goToSlide(currentSlide + 1, total); }
+        function prevSlide(total) { goToSlide(currentSlide - 1, total); }
+
+        // ============================================================
+        // IMAGES — returns array of objects with primary + fallback URLs
+        // ============================================================
+        function getImagesFromRoute(match) {
+            const images = [];
+            if (!match) return images;
+
+            for (let i = 1; i <= 3; i++) {
+                const key = 'image_' + i;
+                const rawValue = safeStr(match[key]);
+                if (!rawValue) continue;
+
+                let id = rawValue;
+                if (rawValue.indexOf('http') === 0) {
+                    const dMatch = rawValue.match(/\/d\/([a-zA-Z0-9_-]+)/);
+                    const idMatch = rawValue.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+                    id = (dMatch && dMatch[1]) || (idMatch && idMatch[1]) || rawValue;
+                }
+
+                images.push({
+                    id: id,
+                    primary: 'https://lh3.googleusercontent.com/d/' + id + '=w1000',
+                    fallback: 'https://drive.google.com/thumbnail?id=' + id + '&sz=w1000'
+                });
+            }
+            return images;
+        }
+
+        // ============================================================
+        // LOAD DATA
+        // ============================================================
+        async function loadFareData() {
+            showLoading(true);
+            setStatus('Loading…', 'loading');
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(function() { controller.abort(); }, 15000);
+
+            try {
+                const res = await fetch(API_URL + '?t=' + Date.now(), {
+                    cache: 'no-store',
+                    headers: { 'Accept': 'application/json' },
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const raw = await res.json();
+                if (raw.error) throw new Error(raw.message || 'Server error');
+                if (!Array.isArray(raw) || raw.length === 0) throw new Error('No fare data available');
+
+                fareData = raw;
+                try {
+                    localStorage.setItem('keke_fares_cache', JSON.stringify(raw));
+                    localStorage.setItem('keke_fares_cache_time', Date.now());
+                } catch (e) {}
+
+                const locationSet = new Set();
+                fareData.forEach(function(row) {
+                    const f = safeStr(row.from_location);
+                    const t = safeStr(row.to_location);
+                    if (f) locationSet.add(f);
+                    if (t) locationSet.add(t);
+                });
+                allLocations = Array.from(locationSet).sort();
+
+                if (allLocations.length === 0) throw new Error('No locations found');
+
+                showLoading(false);
+                offlineBanner.classList.remove('show');
+                setStatus('✅ ' + fareData.length + ' routes loaded');
+                getFareBtn.disabled = false;
+            } catch (err) {
+                clearTimeout(timeoutId);
+                console.error('API Error:', err);
+
+                try {
+                    const cached = localStorage.getItem('keke_fares_cache');
+                    if (cached) {
+                        fareData = JSON.parse(cached);
+                        const locationSet = new Set();
+                        fareData.forEach(function(row) {
+                            const f = safeStr(row.from_location);
+                            const t = safeStr(row.to_location);
+                            if (f) locationSet.add(f);
+                            if (t) locationSet.add(t);
+                        });
+                        allLocations = Array.from(locationSet).sort();
+                        showLoading(false);
+                        offlineBanner.classList.add('show');
+                        setStatus('📴 Offline mode');
+                        getFareBtn.disabled = false;
+                        return;
+                    }
+                } catch (e) {}
+
+                showLoading(false);
+                setStatus('⚠️ ' + err.message, 'error');
+                getFareBtn.disabled = true;
+            }
+        }
+
+        // ============================================================
+        // FIND FARE
+        // ============================================================
+        function findFare() {
+            const from = safeStr(fromInput.value);
+            const to = safeStr(toInput.value);
+
+            if (!from || !to) {
+                popupContent.innerHTML = '<div class="popup-not-found">' +
+                    '<span class="not-found-icon">⚠️</span>' +
+                    '<div class="not-found-text">Both locations required</div>' +
+                    '<div class="not-found-sub">Please pick a start and end point</div></div>';
+                openPopup();
+                setStatus('Select both locations', 'error');
+                return;
+            }
+
+            if (from.toLowerCase() === to.toLowerCase()) {
+                popupContent.innerHTML = '<div class="popup-not-found">' +
+                    '<span class="not-found-icon">🔄</span>' +
+                    '<div class="not-found-text">Same location</div>' +
+                    '<div class="not-found-sub">Pickup and destination must differ</div></div>';
+                openPopup();
+                setStatus('Pick different locations', 'error');
+                return;
+            }
+
+            const fromLower = from.toLowerCase();
+            const toLower = to.toLowerCase();
+
+            const match = fareData.find(function(row) {
+                return safeStr(row.from_location).toLowerCase() === fromLower &&
+                       safeStr(row.to_location).toLowerCase() === toLower;
+            });
+
+            if (match) {
+                currentMatch = match;
+                currentFrom = from;
+                currentTo = to;
+
+                const fare = parseFloat(match.fare_ghs);
+                const fareDisplay = isNaN(fare) ? safeStr(match.fare_ghs) : 'GHS ' + fare.toFixed(2);
+                currentFareDisplay = fareDisplay;
+
+                const images = getImagesFromRoute(match);
+                const hasImages = images.length > 0;
+                const isFav = isFavorite(from, to);
+
+                addRecent(from, to);
+                logAnalytics('lookup', from, to, fareDisplay);
+
+                let updatedText = '';
+                if (match.updated_at) {
+                    const d = new Date(match.updated_at);
+                    if (!isNaN(d.getTime())) updatedText = 'Last updated: ' + d.toLocaleDateString();
+                }
+
+                let sliderHTML = '';
+                if (hasImages) {
+                    if (images.length > 1) {
+                        sliderHTML = '<div class="slider-container">' +
+                            '<div class="slider-track">' +
+                                images.map(function(imgObj, idx) {
+                                    return '<div class="slider-slide" data-img-url="' + esc(imgObj.primary) + '">' +
+                                        '<img src="' + esc(imgObj.primary) + '" loading="lazy" ' +
+                                        'data-primary="' + esc(imgObj.primary) + '" ' +
+                                        'data-fallback="' + esc(imgObj.fallback) + '" ' +
+                                        'data-tried-fallback="0" ' +
+                                        'onerror="handleImageError(this)" />' +
+                                        '<div class="image-gradient"></div>' +
+                                        '<span class="route-badge-large">📍 ' + esc(from) + ' <span class="arrow-icon">→</span> ' + esc(to) + '</span>' +
+                                    '</div>';
+                                }).join('') +
+                            '</div>' +
+                            '<div class="slider-dots">' +
+                                images.map(function(_, idx) {
+                                    return '<button class="slider-dot ' + (idx === 0 ? 'active' : '') + '" data-slide="' + idx + '"></button>';
+                                }).join('') +
+                            '</div>' +
+                            '<button class="slider-arrow prev" data-nav="prev">‹</button>' +
+                            '<button class="slider-arrow next" data-nav="next">›</button>' +
+                        '</div>';
+                    } else {
+                        sliderHTML = '<div class="slider-container">' +
+                            '<div class="slider-track">' +
+                                '<div class="slider-slide" data-img-url="' + esc(images[0].primary) + '">' +
+                                    '<img src="' + esc(images[0].primary) + '" loading="lazy" ' +
+                                    'data-primary="' + esc(images[0].primary) + '" ' +
+                                    'data-fallback="' + esc(images[0].fallback) + '" ' +
+                                    'data-tried-fallback="0" ' +
+                                    'onerror="handleImageError(this)" />' +
+                                    '<div class="image-gradient"></div>' +
+                                    '<span class="route-badge-large">📍 ' + esc(from) + ' <span class="arrow-icon">→</span> ' + esc(to) + '</span>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>';
+                    }
+                } else {
+                    const fallbackImg = 'https://picsum.photos/seed/' + encodeURIComponent(from + to) + '/600/350';
+                    sliderHTML = '<div class="slider-container">' +
+                        '<div class="slider-track">' +
+                            '<div class="slider-slide">' +
+                                '<img src="' + fallbackImg + '" loading="lazy" />' +
+                                '<div class="image-gradient"></div>' +
+                                '<span class="route-badge-large">📍 ' + esc(from) + ' <span class="arrow-icon">→</span> ' + esc(to) + '</span>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
+                }
+
+                popupContent.innerHTML =
+                    sliderHTML +
+                    '<div class="popup-content">' +
+                        '<div class="fare-header">' +
+                            '<span class="fare-label">💰 Fare</span>' +
+                            '<span class="verified-badge">✅ Verified</span>' +
+                        '</div>' +
+                        '<div class="fare-amount">' + esc(fareDisplay) + '</div>' +
+                        '<div class="route-display-large">' + esc(from) + ' <span class="arrow">→</span> ' + esc(to) + '</div>' +
+                        (updatedText ? '<span class="last-updated">' + esc(updatedText) + '</span>' : '') +
+                        '<hr class="divider" />' +
+                        '<div class="details-grid">' +
+                            '<div class="detail-card"><span class="detail-icon">📏</span><div class="detail-label">Distance</div><div class="detail-value">' + esc(safeStr(match.distance_km) || 'N/A') + ' km</div></div>' +
+                            '<div class="detail-card"><span class="detail-icon">📌</span><div class="detail-label">Status</div><div class="detail-value"><span class="badge-sm">' + esc(safeStr(match.notes) || 'Standard') + '</span></div></div>' +
+                            '<div class="detail-card"><span class="detail-icon">📸</span><div class="detail-label">Images</div><div class="detail-value">' + images.length + '</div></div>' +
+                        '</div>' +
+                        '<div class="action-row">' +
+                            '<button class="btn-action favorite-btn ' + (isFav ? 'active' : '') + '" id="favBtn">' + (isFav ? '⭐' : '☆') + '</button>' +
+                            '<button class="btn-action" id="reportBtn">📢</button>' +
+                            '<button class="btn-action primary" id="shareBtn">📤 Share</button>' +
+                        '</div>' +
+                    '</div>';
+
+                attachPopupEvents(from, to, fareDisplay, images.length);
+
+                if (slideInterval) { clearInterval(slideInterval); slideInterval = null; }
+                currentSlide = 0;
+                if (images.length > 1) {
+                    slideInterval = setInterval(function() {
+                        currentSlide = (currentSlide + 1) % images.length;
+                        goToSlide(currentSlide, images.length);
+                    }, 4000);
+                }
+
+                openPopup();
+                setStatus('✔️ Fare found');
+            } else {
+                logAnalytics('not_found', from, to, '');
+                popupContent.innerHTML = '<div class="popup-not-found">' +
+                    '<span class="not-found-icon">🚫</span>' +
+                    '<div class="not-found-text">Route not found</div>' +
+                    '<div class="not-found-sub">No direct fare for <strong>' + esc(from) + '</strong> → <strong>' + esc(to) + '</strong></div>' +
+                    '<button class="report-btn" id="notFoundReportBtn">📢 Report or suggest this route</button></div>';
+
+                const nfBtn = document.getElementById('notFoundReportBtn');
+                if (nfBtn) nfBtn.addEventListener('click', function(e) {
+                    e.preventDefault(); e.stopPropagation(); openReport(from, to);
+                });
+
+                openPopup();
+                setStatus('❌ No route', 'error');
+            }
+        }
+
+        // ============================================================
+        // ATTACH POPUP EVENTS
+        // ============================================================
+        function attachPopupEvents(from, to, fareDisplay, imageCount) {
+            popupContent.querySelectorAll('.slider-dot').forEach(function(dot) {
+                dot.addEventListener('click', function(e) {
+                    e.preventDefault(); e.stopPropagation();
+                    goToSlide(parseInt(this.dataset.slide), imageCount);
+                });
+            });
+
+            popupContent.querySelectorAll('[data-nav="prev"]').forEach(function(b) {
+                b.addEventListener('click', function(e) {
+                    e.preventDefault(); e.stopPropagation();
+                    prevSlide(imageCount);
+                });
+            });
+            popupContent.querySelectorAll('[data-nav="next"]').forEach(function(b) {
+                b.addEventListener('click', function(e) {
+                    e.preventDefault(); e.stopPropagation();
+                    nextSlide(imageCount);
+                });
+            });
+
+            popupContent.querySelectorAll('.slider-slide').forEach(function(slide) {
+                slide.addEventListener('click', function(e) {
+                    e.preventDefault(); e.stopPropagation();
+                    const url = this.dataset.imgUrl;
+                    if (url) openImageViewer(url);
+                });
+            });
+
+            const favBtn = document.getElementById('favBtn');
+            if (favBtn) favBtn.addEventListener('click', function(e) {
+                e.preventDefault(); e.stopPropagation();
+                const added = toggleFavorite(from, to);
+                this.textContent = added ? '⭐' : '☆';
+                this.classList.toggle('active', added);
+                setStatus(added ? '⭐ Added to favorites' : 'Removed from favorites');
+            });
+
+            const repBtn = document.getElementById('reportBtn');
+            if (repBtn) repBtn.addEventListener('click', function(e) {
+                e.preventDefault(); e.stopPropagation(); openReport(from, to);
+            });
+
+            const shareBtn = document.getElementById('shareBtn');
+            if (shareBtn) shareBtn.addEventListener('click', function(e) {
+                e.preventDefault(); e.stopPropagation(); openShareMenu(from, to, fareDisplay);
+            });
+        }
+
+        // ============================================================
+        // SHARE MENU
+        // ============================================================
+        function openShareMenu(from, to, fareDisplay) {
+            currentFrom = from; currentTo = to; currentFareDisplay = fareDisplay;
+            shareMenuSubtitle.textContent = from + ' → ' + to + ' • ' + fareDisplay;
+            shareMenu.classList.add('active');
+        }
+
+        function closeShareMenu() {
+            shareMenu.classList.remove('active');
+        }
+
+        function getShareText() {
+            return '🛺 Keke Fare\n\n' + currentFrom + ' → ' + currentTo +
+                   '\nFare: ' + currentFareDisplay +
+                   '\n\nPowered by Liko Tec Solutions';
+        }
+
+        function getShareUrl() {
+            return window.location.href.split('?')[0];
+        }
+
+        document.getElementById('shareWhatsApp').addEventListener('click', function(e) {
+            e.preventDefault(); e.stopPropagation();
+            const text = encodeURIComponent(getShareText() + '\n' + getShareUrl());
+            window.open('https://wa.me/?text=' + text, '_blank');
+            closeShareMenu();
+        });
+
+        document.getElementById('shareCopy').addEventListener('click', function(e) {
+            e.preventDefault(); e.stopPropagation();
+            const text = getShareText() + '\n' + getShareUrl();
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(function() {
+                    closeShareMenu();
+                    setStatus('📋 Copied!');
+                    setTimeout(function() { setStatus('Ready'); }, 1500);
+                }).catch(function() { fallbackCopy(text); });
+            } else {
+                fallbackCopy(text);
+            }
+        });
+
+        function fallbackCopy(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); setStatus('📋 Copied!'); } catch (e) {}
+            document.body.removeChild(ta);
+            closeShareMenu();
+            setTimeout(function() { setStatus('Ready'); }, 1500);
+        }
+
+        document.getElementById('shareNative').addEventListener('click', function(e) {
+            e.preventDefault(); e.stopPropagation();
+            const text = getShareText() + '\n' + getShareUrl();
+            if (navigator.share) {
+                navigator.share({ title: 'Keke Fare', text: text }).catch(function() {});
+                closeShareMenu();
+            } else {
+                fallbackCopy(text);
+            }
+        });
+
+        document.getElementById('shareImage').addEventListener('click', function(e) {
+            e.preventDefault(); e.stopPropagation();
+            closeShareMenu();
+            shareAsImage(currentFrom, currentTo, currentFareDisplay);
+        });
+
+        document.getElementById('shareMenuCancel').addEventListener('click', function(e) {
+            e.preventDefault(); e.stopPropagation();
+            closeShareMenu();
+        });
+
+        shareMenu.addEventListener('click', function(e) {
+            if (e.target === shareMenu) closeShareMenu();
+        });
+
+        // ============================================================
+        // SHARE AS IMAGE
+        // ============================================================
+        function shareAsImage(from, to, fareDisplay) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 600; canvas.height = 400;
+            const ctx = canvas.getContext('2d');
+
+            const grad = ctx.createLinearGradient(0, 0, 600, 400);
+            grad.addColorStop(0, '#f97316'); grad.addColorStop(1, '#ea580c');
+            ctx.fillStyle = grad; ctx.fillRect(0, 0, 600, 400);
+
+            ctx.fillStyle = 'rgba(255,255,255,0.95)';
+            roundRect(ctx, 40, 40, 520, 320, 30);
+            ctx.fill();
+
+            ctx.fillStyle = '#0b1a33'; ctx.font = 'bold 24px Inter, sans-serif'; ctx.textAlign = 'center';
+            ctx.fillText('🛺 Keke Fare', 300, 90);
+
+            ctx.fillStyle = '#94a3b8'; ctx.font = '500 13px Inter, sans-serif';
+            ctx.fillText('Ho Township • Real-time rates', 300, 115);
+
+            ctx.fillStyle = '#f97316'; ctx.font = 'bold 22px Inter, sans-serif';
+            ctx.fillText(from + ' → ' + to, 300, 175);
+
+            ctx.fillStyle = '#0b1a33'; ctx.font = 'bold 60px Inter, sans-serif';
+            ctx.fillText(fareDisplay, 300, 260);
+
+            ctx.fillStyle = '#94a3b8'; ctx.font = '500 11px Inter, sans-serif';
+            ctx.fillText('Powered by Liko Tec Solutions', 300, 335);
+
+            canvas.toBlob(function(blob) {
+                if (!blob) { setStatus('Image failed', 'error'); return; }
+                const file = new File([blob], 'keke-fare.png', { type: 'image/png' });
+
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    navigator.share({
+                        files: [file], title: 'Keke Fare',
+                        text: from + ' → ' + to + ' = ' + fareDisplay
+                    }).then(function() { setStatus('📤 Shared'); }).catch(function() {});
+                } else {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url; a.download = 'keke-fare.png';
+                    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    setStatus('🖼️ Image downloaded');
+                }
+            }, 'image/png');
+        }
+
+        function roundRect(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.arcTo(x + w, y, x + w, y + h, r);
+            ctx.arcTo(x + w, y + h, x, y + h, r);
+            ctx.arcTo(x, y + h, x, y, r);
+            ctx.arcTo(x, y, x + w, y, r);
+            ctx.closePath();
+        }
+
+        // ============================================================
+        // REPORT
+        // ============================================================
+        function openReport(from, to) {
+            reportContext = { from: from, to: to };
+            reportRouteText.textContent = 'Route: ' + from + ' → ' + to;
+            reportFare.value = ''; reportComment.value = '';
+            reportOverlay.classList.add('active');
+        }
+
+        function closeReport() {
+            reportOverlay.classList.remove('active');
+        }
+
+        function submitReport() {
+            const fare = safeStr(reportFare.value);
+            const comment = safeStr(reportComment.value);
+            if (!fare && !comment) { alert('Please add the fare or a comment'); return; }
+
+            reportSubmitBtn.disabled = true;
+            reportSubmitBtn.textContent = 'Sending…';
+
+            fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    type: 'report',
+                    from_location: reportContext.from,
+                    to_location: reportContext.to,
+                    reported_fare: fare, comment: comment
+                })
+            }).then(function(r) { return r.json(); }).then(function(res) {
+                reportSubmitBtn.disabled = false;
+                reportSubmitBtn.textContent = 'Submit';
+                if (res.success) {
+                    closeReport();
+                    setStatus('✅ Report sent. Thank you!');
+                } else { setStatus('⚠️ Report failed', 'error'); }
+            }).catch(function() {
+                reportSubmitBtn.disabled = false;
+                reportSubmitBtn.textContent = 'Submit';
+                setStatus('⚠️ Report failed', 'error');
+            });
+        }
+
+        reportCancelBtn.addEventListener('click', function(e) {
+            e.preventDefault(); e.stopPropagation(); closeReport();
+        });
+        reportSubmitBtn.addEventListener('click', function(e) {
+            e.preventDefault(); e.stopPropagation(); submitReport();
+        });
+        reportOverlay.addEventListener('click', function(e) {
+            if (e.target === reportOverlay) closeReport();
+        });
+
+        // ============================================================
+        // EXPOSE GLOBALLY
+        // ============================================================
+        window.closePopup = closePopup;
+        window.goToSlide = goToSlide;
+        window.nextSlide = nextSlide;
+        window.prevSlide = prevSlide;
+
+        // ============================================================
+        // EVENTS
+        // ============================================================
+        swapBtn.addEventListener('click', function() {
+            const f = fromInput.value, t = toInput.value;
+            fromInput.value = t; toInput.value = f;
+            updateClearButtons();
+        });
+
+        getFareBtn.addEventListener('click', findFare);
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && (e.target === fromInput || e.target === toInput)) {
+                e.preventDefault();
+                fromList.classList.remove('show');
+                toList.classList.remove('show');
+                getFareBtn.click();
+            }
+        });
+
+        document.addEventListener('contextmenu', function(e) {
+            if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') e.preventDefault();
+        });
+        document.addEventListener('copy', function(e) {
+            if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') e.preventDefault();
+        });
+
+        // INIT
+        renderRecent();
+        renderFavorites();
+        loadFareData();
+
+        console.log('🛺 Keke Fare v2.3 — image fallback chain active');
+    </script>
+
+</body>
+</html>
